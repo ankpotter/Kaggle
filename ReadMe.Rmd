@@ -1,0 +1,51 @@
+---
+title: "Titanic"
+author: "Ankit Ranjan"
+---
+
+### Preparation
+
+Set seeds to make this code repeatable, import all necessary packages
+```{r set seed}
+library(caret)
+library(randomForest)
+library(fields)
+library(e1071)
+set.seed(42)
+```
+
+### Set Working Directory and Load Data
+```{r }
+setwd('D:/Kaggle/Titanic')
+trainSet <- read.table("train.csv", sep = ",", header = TRUE)
+testSet <- read.table("test.csv", sep = ",", header = TRUE)
+```
+
+### Doing initial analysis on the features
+```{r}
+table(trainSet[,c("Survived", "Pclass")])
+table(trainSet$Survived,trainSet$SibSp)
+table(trainSet$Survived,trainSet$Parch)
+bplot.xy(trainSet$Survived, trainSet$Age)
+bplot.xy(trainSet$Survived, trainSet$Fare)
+```
+
+### Train Model
+
+First we set Survived as a factor and then do the modelling.
+
+```{r }
+trainSet$Survived <- factor(trainSet$Survived)
+model <- train(Survived ~ Pclass + Sex + SibSp + Embarked + Parch + Fare,data = trainSet,method = "rf",trControl = trainControl(method = "cv",number = 5))
+#model summary
+model
+```
+
+### Determine the values for Test set
+The initial prediction gave error. Upon checking i realised the Fare for one of the rows has N/A value. So, the values was replaced by the mean of overall fares.
+```{r }
+testSet$Fare <- ifelse(is.na(testSet$Fare), mean(testSet$Fare, na.rm = TRUE), testSet$Fare)
+testSet$Survived <- predict(model, newdata = testSet)
+```
+
+### Submit Data !
