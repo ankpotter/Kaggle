@@ -3,6 +3,7 @@ library(caret)
 library(randomForest)
 library(fields)
 library(e1071)
+set.seed(42)
 
 #set working directory
 setwd('D:/Kaggle/Titanic')
@@ -25,7 +26,6 @@ bplot.xy(trainSet$Survived, trainSet$Fare)
 #the plots are vastly different for survived and died people
 
 trainSet$Survived <- factor(trainSet$Survived)
-set.seed(42)
 
 # Train the model using a "random forest" algorithm
 model <- train(Survived ~ Pclass + Sex + SibSp + Embarked + Parch + Fare,data = trainSet,method = "rf",trControl = trainControl(method = "cv",number = 5))
