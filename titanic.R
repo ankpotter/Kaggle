@@ -29,7 +29,8 @@ trainSet$Survived <- factor(trainSet$Survived)
 
 # Train the model using a "random forest" algorithm
 model <- train(Survived ~ Pclass + Sex + SibSp + Embarked + Parch + Fare,data = trainSet,method = "rf",trControl = trainControl(method = "cv",number = 5))
-
+imp <- varImp(model,scale=FALSE)
+model <- train(Survived ~ Pclass + Sex + SibSp+ Parch + Fare,data = trainSet,method = "rf",trControl = trainControl(method = "cv",number = 5))
 #model summary
 model
 
@@ -44,3 +45,7 @@ testSet$Fare <- ifelse(is.na(testSet$Fare), mean(testSet$Fare, na.rm = TRUE), te
 
 #predict for test set
 testSet$Survived <- predict(model, newdata = testSet)
+
+#csv file for competition submission
+sub <- testSet[,c('PassengerId','Survived')]
+write.table(sub,file='answer.csv',col.names=TRUE, row.names = FALSE, sep = ",")
